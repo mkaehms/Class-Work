@@ -1,0 +1,92 @@
+ for Doctors Without Borders
+
+Doctors Without Borders
+Doctors Without Borders is dedicated to providing medical to those in need around the globe with impartial neutrality.
+
+	Crisis Locations
+A crisis site has a country it occurred in.[H], [J]
+A crisis site has an identification number.[H],[J]
+A crisis site has a crisis type.[H], [J]
+A crisis site has a crisis level. [H], [J]
+A crisis site has an start of crisis time.[H], [J]
+A crisis site has an estimated size of affected area.[H], [J]
+A crisis site has an estimated number of affected people.[H],[J]
+A crisis site has an estimated number of deaths.[H], [J]
+A crisis site has an estimated number of patients.[H], [J]
+A crisis site has types of measures that it may currently be taking.[H], [J]
+Measures may involve prevention/education.
+Measures may involve triage.
+Measures may involve counciling.
+Measures may involve speaking out about an issue.
+A crisis site has an estimated cost of damages.[H],[J]
+A crisis site has an initial [DWB] groups arrival time.[H], [J]
+	
+Doctors Without Borders Headquarters
+A [DWBHQ] has a country it’s located in.[M], [J]
+A [DWBHQ] has a distance from a crisis site.[M], [J]
+A [DWBHQ] has a receival of crisis alert time.[M], [J]
+A [DWBHQ] has a phone number.[M], [J]
+A [DWBHQ] has an email address.[M], [J]
+
+A crisis site has a nearest [DWB] headquarters location.[J]
+A crisis site sends a report to the nearest [DWBHQ] location. [J]
+A crisis report may be sent by email to the nearest [DWBHQ]’s email address. [J]
+
+References:
+[H] - Haiti
+[J] - Japan
+[M] - Mexico
+[DWB] - Doctors Without Borders
+[DWBHQ] - Doctors Without Borders Headquarters
+
+Entity
+Attributes
+Crisis Site
+Sitecountry, siteNum(key), crisisType, crisisLvl, crisisStart, estAreaSize, est#Dead, est#Patients, estCost, arriveTime
+Nearest [DWBHQ]
+HQcountry, siteNum(key), distance, alertReceivedTime, phone#, emailAdd.
+currentMeasures 
+PrevEd, Triage, Council, OutReach, siteNum(key)
+
+Relationship:
+Nearest [DWBHQ]:Crisis Site is a one-to-one relationship. The Crisis Site entity is the owner entity, so when we do the ER-to-relational conversion, the key of the Crisis Site entity (siteNum) will help identify the Nearest [DWBHQ]. Participation on both sides is mandatory.
+Crisis Site:currentMeasures is a one-to-numerous relationship. The Crisis Site entity is the owner entity, so when we do the ER-to-relational conversion, the key of the Crisis Site entity (siteNum) will help identify the which Measures need to be taken. Participation of Crisis Site is mandatory, however participation of Measures is optional since not all measures must be taken.
+
+
+
+
+
+Entity-Relationship to Relational conversion
+
+1)Tables would initially include, Crisis Site, currentMeasures, and Nearest[DWBHQ]
+2)There are two relationships, Crisis Site:currentMeasures and Crisis Site:Nearest[DWBHQ], both relationships will be handled by putting the key of Crisis Site in currentMeasures and Nearest[DWBHQ] as both the primary key and a foreign key.
+3)There are no multivalued attributes.
+4)Crisis Site: siteNum(PK), Sitecountry, crisisType, crisisLvl, crisisStart, estAreaSize,			 est#Dead, est#Patients, estCost, arriveTime
+  Measures: siteNum(PFK), PrevEd, Triage, Council, OutReach
+  Nearest[DWBHQ]: siteNum(PFK), HQcountry, distance, alertReceivedTime, phone#, 			email address
+
+
+Normalization
+
+The (preliminary) attributes are siteNum, Sitecountry, HQcountry, crisisType, crisisLvl, crisisStart, estAreaSize, est#Dead, est#Patients, estCost, alertRecievedTime, arriveTime, distance, phone#, emailAdd, PrevEd, Triage, Council, OutReach.
+
+{siteNum} → {Sitecountry, crisisType, crisisLvl, crisisStart, arriveTime, estAreaSize, est#Dead, est#Patients, estCost}
+
+	{siteNum} → {HQcountry, distance, alertRecievedTime}
+
+	{siteNum} → {PrevEd, Triage, Council, OutReach}
+
+	{HQcountry} → {phone#, emailAdd}
+
+	{crisisType, crisisLvl, Sitecountry, crisisStart} → {PrevEd, Triage, Council, OutReach}
+ 
+{crisisStart, crisisType, crisisLvl} → {estAreaSize, est#Dead, est#Patients, estCost}
+
+{alertRecievedTime, distance} → {arriveTime}
+
+
+Combine siteNum dependencies into one table
+	{siteNum, Sitecountry, crisisType, crisisLvl, crisisStart, arriveTime, estAreaSize, est#Dead, est#Patients, estCost, HQcountry, distance, alertRecievedTime, PrevEd, Triage, Council, OutReach} with key of siteNum.
+	then ignore dependent attributes already listed
+	so,
+	{HQcounrty, phone#, emailAdd} are a table with key of HQcountry.
