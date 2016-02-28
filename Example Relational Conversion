@@ -1,0 +1,69 @@
+Entity-Relationship to Relational conversion
+ for Doctors Without Borders
+
+Doctors Without Borders
+Doctors Without Borders is dedicated to providing medical to those in need around the globe with impartial neutrality.
+
+	Crisis Locations
+A crisis site has a country it occurred in.[H], [J]
+A crisis site has an identification number.[H],[J]
+A crisis site has a crisis type.[H], [J]
+A crisis site has an start of crisis time.[H], [J]
+A crisis site has an estimated size of affected area.[H], [J]
+A crisis site has an estimated number of affected people.[H],[J]
+A crisis site has an estimated number of deaths.[H], [J]
+A crisis site has an estimated number of patients.[H], [J]
+A crisis site has types of measures that may be taken.[H], [J]
+Measures may involve prevention/education.
+Measures may involve triage.
+Measures may involve counciling.
+Measures may involve speaking out about an issue.
+A crisis site has an estimated cost of damages.[H],[J]
+A crisis site has an initial [DWB] groups arrival time.[H], [J]
+	
+Doctors Without Borders Headquarters
+A [DWBHQ] has a country it’s located in.[M], [J]
+A [DWBHQ] has a distance from a crisis site.[M], [J]
+A [DWBHQ] has a receival of crisis alert time.[M], [J]
+A [DWBHQ] has a phone number.[M], [J]
+A [DWBHQ] has an email address.[M], [J]
+
+A crisis site has a nearest [DWB] headquarters location.[J]
+A crisis site sends a report to the nearest [DWBHQ] location. [J]
+A crisis report may be sent by email to the nearest [DWBHQ]’s email address. [J]
+
+References:
+[H] - Haiti
+[J] - Japan
+[M] - Mexico
+[DWB] - Doctors Without Borders
+[DWBHQ] - Doctors Without Borders Headquarters
+
+
+Entity
+Attributes
+Crisis Site
+country, siteNum(key), crisisType, crisisStart, estAreaSize, est#Dead, est#Patients, estCost, arriveTime
+Nearest [DWBHQ]
+country, siteNum(key), distance, alertReceivedTime, phone#, email address.
+
+
+Measures 
+PrevEd, Triage, Council, OutReach, siteNum(key)
+
+Relationship:
+Nearest [DWBHQ]:Crisis Site is a one-to-one relationship. The Crisis Site entity is the owner entity, so when we do the ER-to-relational conversion, the key of the Crisis Site entity (siteNum) will help identify the Nearest [DWBHQ]. Participation on both sides is mandatory.
+Crisis Site:Measures is a one-to-numerous relationship. The Crisis Site entity is the owner entity, so when we do the ER-to-relational conversion, the key of the Crisis Site entity (siteNum) will help identify the which Measures need to be taken. Participation of Crisis Site is mandatory, however participation of Measures is optional since not all measures must be taken.
+
+
+
+
+
+Entity-Relationship to Relational conversion
+
+1)Tables would initially include, Crisis Site, Measures, and Nearest[DWBHQ]
+2)There are two relationships, Crisis Site:Measures and Crisis Site:Nearest[DWBHQ], both relationships will be handled by putting the key of Crisis Site in Measures and Nearest[DWBHQ] as both the primary key and a foreign key.
+3)There are no multivalued attributes.
+4)Crisis Site: siteNum(PK), country, crisisType, crisisStart, estAreaSize, est#Dead,			 est#Patients, estCost, arriveTime
+  Measures: siteNum(PFK), PrevEd, Triage, Council, OutReach
+  Nearest[DWBHQ]: siteNum(PFK), country, distance, alertReceivedTime, phone#, 			email address
