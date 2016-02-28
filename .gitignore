@@ -1,0 +1,290 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package kaehmstictactoe;
+
+import java.awt.*;
+import javax.swing.*;
+import java.awt.event.*;
+//reset labels instead of new tictactoe
+/**
+ *
+ * @author Megan
+ */
+public class KaehmsTicTacToe implements ActionListener{
+
+    /**
+     * @param args the command line arguments
+     */
+    JFrame frame = new JFrame();
+    JFrame popup = new JFrame();
+    JButton[][] buttons = new JButton[3][3];
+    int Hw = 0;
+    int Cw = 0;
+    int ts = 0;
+    int turn;
+    int gamecount = 0;
+    JLabel Hwins = new JLabel("Human Wins: "+Hw);
+    JLabel Cwins = new JLabel("Computer Wins: "+Cw);
+    JLabel Ties = new JLabel("Ties: "+ts);
+    JLabel Games = new JLabel("Games: "+gamecount);
+    int[][] grid = new int[3][3];
+    Container north = new Container();
+    Container board = new Container();
+    Container choice = new Container();
+    Container south = new Container();
+    
+    public KaehmsTicTacToe(){
+      //  setTurn();
+      //  System.out.println(gamecount);
+        Board();
+       Play();
+    }
+  //BOARD
+    public void Board(){    
+        frame.setSize(600,400);
+        
+        //border lyout
+        frame.setLayout(new BorderLayout());
+        //north container
+        north.setLayout(new GridLayout(Integer.parseInt(Character.toString('2')),Integer.parseInt(Character.toString('2'))));
+        north.add(Hwins);
+        north.add(Cwins);
+        north.add(Ties);
+        north.add(Games);
+        frame.add(north, BorderLayout.NORTH);
+        //board container
+        board.setLayout(new GridLayout(3,3));
+        for (int i = 0; i < buttons.length; i++) {
+            for (int j = 0; j < buttons.length; j++) {
+                buttons[i][j] = new JButton(j+","+i);
+                buttons[i][j].addActionListener(this);
+                board.add(buttons[i][j]);
+                grid[i][j] = 0;
+            }
+           }
+        frame.add(board, BorderLayout.CENTER);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        
+    }
+    
+//RESET
+    public void Reset(){
+     gamecount++;
+     System.out.println(gamecount);
+     Games.setText("Games: "+gamecount);
+    //ames.repaint();
+     JButton current;
+     for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                current = buttons[i][j];
+                current.setText(j+","+i);
+                current.addActionListener(this);
+               // board.add(buttons[i][j]);
+                grid[i][j] = 0;
+            }
+           }
+    //oard.validate();
+    //rame.validate();
+     Play();
+    }
+
+//Human Move
+   @Override
+    public void actionPerformed(ActionEvent event){
+        System.out.println("You clicked a button");
+        JButton current;
+         for (int i = 0; i < buttons.length; i++) {
+            for (int j = 0; j < buttons.length; j++) {
+                if(event.getSource().equals(buttons[i][j])){
+                   if(grid[i][j] == 0){
+                    current = buttons[i][j];
+                    current.setText("H");
+                    grid[i][j] = 1;
+                }
+                }
+            
+             }//end j
+         }//end i
+        if(won() == -1 ){
+                updateCwins(Cw);
+                System.out.println("Computer won!");
+                Reset();
+            }
+        else if(fullBoard()){
+                updatets(ts);
+                System.out.println("Full Board. Draw!");
+               Reset();
+                       }
+        else{
+            attempt[0] = (int) ((Math.random() * 3) + 1);
+            attempt[1] = (int) ((Math.random() * 3) + 1);
+            attempt[0]--;
+            attempt[1]--;
+            if(getPosition(attempt)==0){
+             int i = attempt[0];
+             int j = attempt[1];
+             ComputerMove(i, j);}
+        }
+
+//Computer Move
+
+    }
+    
+     public void ComputerMove(int i, int j){
+        JButton current;
+        current = buttons[i][j];
+        current.setText("C");
+        grid[i][j] = -1;
+         if(won() == -1 ){
+                updateCwins(Cw);
+                System.out.println("Computer won!");
+                Reset();
+            }
+        else if(fullBoard()){
+                updatets(ts);
+                System.out.println("Full Board. Draw!");
+               Reset();
+                 }
+         else
+        {
+            start(2);
+        }
+
+    }
+Check Available
+    public int getPosition(int[] attempt){
+        return grid[attempt[0]][attempt[1]];
+    }
+
+Check Wins
+    public int checkLines(){
+        for(int line=0 ; line<3 ; line++){
+
+            if( (grid[line][0] + grid[line][1] + grid[line][2]) == -3)
+                return -1;
+            if( (grid[line][0] + grid[line][1] + grid[line][2]) == 3)
+                return 1;
+        }
+        
+        return 0;
+                
+    }
+    
+    public int checkColumns(){
+        for(int column=0 ; column<3 ; column++){
+
+            if( (grid[0][column] + grid[1][column] + grid[2][column]) == -3)
+                return -1;
+            if( (grid[0][column] + grid[1][column] + grid[2][column]) == 3)
+                return 1;
+        }
+        
+        return 0;
+                
+    }
+    
+    public int checkDiagonals(){
+        if( (grid[0][0] + grid[1][1] + grid[2][2]) == -3)
+            return -1;
+        if( (grid[0][0] + grid[1][1] + grid[2][2]) == 3)
+            return 1;
+        if( (grid[0][2] + grid[1][1] + grid[2][0]) == -3)
+            return -1;
+        if( (grid[0][2] + grid[1][1] + grid[2][0]) == 3)
+            return 1;
+        
+        return 0;
+    }
+
+    public boolean fullBoard(){
+        for(int line=0 ; line < 3 ; line++)
+            for(int column=0 ; column < 3 ; column++)
+                if( grid[line][column]==0 )
+                    return false;
+        return true;
+    }
+Update Labels
+
+    public void updateHwins(int Hw){
+        Hw++;
+        Hwins.setText("Human Wins: "+Hw);
+}
+    public void updateCwins(int Cw){
+        Cw++;
+        Cwins.setText("Computer Wins: "+Cw);
+}
+    public void updatets(int ts){
+        ts++;
+        Ties.setText("Ties: "+(ts++));
+}
+
+    //
+    //
+    //
+    //GAME
+    //
+    //
+    //
+    
+   // private int gamecount = 1;
+//    private char who = 1;
+    protected int[] attempt = new int[2];
+    
+//Play
+     public void Play(){
+        if(gamecount%2==1){
+        start(1);}
+        else
+        start(2);
+        }
+     public void start(int p)
+    {
+    if(p == 1)
+            attempt[0] = (int) ((Math.random() * 3) + 1);
+            attempt[1] = (int) ((Math.random() * 3) + 1);
+            attempt[0]--;
+            attempt[1]--;
+            int i = attempt[0];
+             int j = attempt[1];
+             ComputerMove(i, j);
+}
+
+    
+   
+    
+    public int won(){
+        if(checkLines() == 1)
+            return 1;
+        if(checkColumns() == 1)
+            return 1;
+        if(checkDiagonals() == 1)
+            return 1;
+        
+        if(checkLines() == -1)
+            return -1;
+        if(checkColumns() == -1)
+            return -1;
+        if(checkDiagonals() == -1)
+            return -1;
+        
+        return 0;
+    }
+    
+    
+   // CALL
+    
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // TODO code application logic here
+         new KaehmsTicTacToe();
+    }
+    
+}
