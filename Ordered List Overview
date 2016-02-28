@@ -1,0 +1,356 @@
+OLIST
+.h
+#ifndef _OList
+#define _OList
+
+#include <iostream>
+
+using namespace std;
+
+
+class Node {
+public:
+	int data;
+	Node * next;
+};
+
+class OList {
+public:
+	OList();  // create an empty list
+	OList(const OList & otherList); 
+        OList(int nums[], int length); // construct the ordered list using unordered array
+	~OList();
+	void clear();  // clear the list
+	bool isEmpty() const;
+	void printForward() const;
+	void printBackward() const;
+	int getLength() const;
+	void insertVal(int val);  // insert val in the correct position
+	bool delete1Val(int val);  // delete first occurrence. return true iff item was in the list
+        int deleteAllVal(int val);  // delete all occurrences. return number of occurences removed.
+	int front() const;  // value in first->next or throw an appropriate exception if list is empty
+	int back() const; // last value or throw an appropriate exception if list is empty
+	int count(int val) const;  // count occurences of val in the list
+	const OList & operator=(const OList & otherList); // overload assignment
+	OList & operator+=(const OList & otherList); // merge otherList with this list
+        
+
+private:  
+	Node* first; // dummy first node
+	Node* last; // last node (NULL for empty list)
+	int length;  // number of nodes besides first
+	Node* createNode(int val); // create a new node, initialize link to NULL
+	int data;
+	void copyList (const OList & otherList);  // copy constructor and operator=() can use this
+
+};
+
+#endif
+
+
+
+.cpp
+#include<iostream>
+#include<list>
+#include "OList.h"  // Header file
+using namespace std;
+
+OList::OList() : first(nullptr), last(first), length(0)
+{ 
+}
+
+OList::OList(const OList & otherList)
+{
+	if ( otherList.first == NULL)
+        first = NULL;
+    else {
+        first = createNode(otherList.first->data);
+        ++ length;
+        Node *iter = first;
+        for (Node *ptr = otherList.first -> next; ptr != 0; ptr = ptr ->next) 
+		{
+            iter -> next = createNode(ptr ->data);
+            iter = iter -> next;
+            ++ length;
+        }
+	}
+}
+
+OList:: OList(int nums[], int size)
+{//sort array
+	/*
+	for (int i = length-1; i > 0; i--)
+	{
+        for (int j = 0; j < i; j++)
+            if (nums[j] > nums[j+1])
+				swap(nums[j], nums[j+1]);
+	}*/
+	//insert into list
+	for(int i = size - 1; i> 0; i--)
+	{
+		insertVal(nums[i]);
+	}
+}
+
+OList::~OList()
+{
+	clear();
+}
+
+void OList::clear()
+{
+	while(!isEmpty())
+	{
+		Node* temp = NULL;
+		if(length > -1)
+		{
+			temp = first;
+			first = first->next;
+		}
+
+		temp->next = nullptr;
+		delete temp;
+		temp = nullptr;
+		length--;
+		//clear();
+	}
+}
+
+bool OList::isEmpty() const
+{
+	return first == nullptr;
+}
+
+void OList::printForward() const
+{
+		Node * temp = first;
+		while(temp != NULL)
+		{
+		cout<<temp->data<<endl;
+		temp = temp->next;
+		}
+	
+}
+
+void OList::printBackward() const
+{
+	if(first == NULL) return;
+	else
+	{//Reverse List
+		Node * temp = first, *next = NULL, *prev = NULL, *head = first;
+		while(temp != NULL)
+		{
+			next = temp->next;
+			temp->next = prev;
+			prev = temp;
+			temp = next;
+		}
+		head = prev;
+		//Print
+		temp = head;
+		while(temp != NULL)
+		{
+		cout<<temp->data<<endl;
+		temp = temp->next;
+		}
+	}
+}
+
+int OList::getLength() const
+{
+	return length;
+}
+
+void OList::insertVal(int val) 
+{
+   Node * newNodePtr = createNode(val), * h = first;
+   while (h->next != NULL && val > h->next->data)
+   {
+         h = h->next;
+   }
+   newNodePtr->next = h->next;
+   h->next = newNodePtr;
+   
+}
+
+bool OList::delete1Val(int val)
+{
+	if(isEmpty()) return false;
+	Node * current = first, *temp;
+	while(current->next != NULL && val >= current->next->data)
+	{
+		if(current->data == val)
+		{
+		temp = current->next;
+		current->data = current->next->data;
+		current->next = temp->next;
+		delete temp;
+		length--;
+		return true;
+		}
+		else
+		{
+			current = current->next;
+		}
+	}
+	return false;
+}
+
+int OList::deleteAllVal(int val)
+{
+	if(isEmpty()) return 0;
+	Node * current = first, *temp;
+	int found = 0;
+	while(current->next != NULL && val >= current->next->data)
+	{
+		if(current->data == val)
+		{
+		temp = current->next;
+		current->data = current->next->data;
+		current->next = temp->next;
+		delete temp;
+		length--;
+		found++;
+		}
+		else
+		{
+			current = current->next;
+		}
+	}
+	return found;
+	//remove_if(val);
+}
+
+int OList::front() const
+{
+	if(!isEmpty())
+	{
+		return first->next->data;
+	}
+	else
+	{
+		throw "is empty";
+	}
+}
+
+int OList::back() const
+{
+	if(!isEmpty())
+	{
+		return last->data;
+	}
+	else
+	{
+		throw "is empty";
+	}
+}
+
+int OList::count(int val) const
+{
+	if(isEmpty()) return 0;
+	Node * current = first;
+	int count = 0;
+	while(current->next != NULL && val >= current->next->data)
+	{
+		if(current->data == val)
+		{
+		count++;
+		}
+		else
+		{
+			current = current->next;
+		}
+	}
+	return count;
+}
+
+const OList & OList::operator=(const OList & otherList)
+{
+	copyList(otherList);
+	return *this;
+}
+
+OList & OList::operator+=(const OList & otherList)
+{
+	if(otherList.isEmpty()) 
+	{
+		return *this;
+	}
+	else if(isEmpty())
+	{ 
+		copyList(otherList);
+		return *this;
+	}
+	else
+	{
+	Node * current = first, *occur = otherList.first;
+	int count = 0;
+	while(current->next != NULL)
+	{
+		if(current->data <= occur->data)
+		{
+		insertVal(occur->data);
+		occur = occur->next;
+		current = current->next;
+		}
+		else
+		{
+			current = current->next;
+		}
+	}
+	return *this;
+	}
+}
+
+void OList::copyList (const OList & otherList)
+{
+	clear();
+	if ( otherList.first == NULL)
+        first = NULL;
+    else {
+        first = createNode(otherList.first->data);
+        ++ length;
+        Node *iter = first;
+        for (Node *ptr = otherList.first -> next; ptr != 0; ptr = ptr ->next) 
+		{
+            iter -> next = createNode(ptr ->data);
+            iter = iter -> next;
+            ++ length;
+        }
+	}
+}
+
+
+
+
+.cpp tester
+#include<iostream>
+#include<list>
+#include"OList.h"
+
+using namespace std;
+
+int main()
+{
+	OList mylist, copylist, doubled;
+	int myarray[] = {5 ,12, 13, 2};
+	mylist(myarray, 4);
+	copylist = mylist;
+	doubled += copylist;
+	doubled += copylist;
+
+	cout<<"forwards: ";
+	doubled.printForward();
+	cout<<endl<<"backwards: ";
+	doubled.printBackward();
+	cout<<endl;
+
+	doubled.delete1Val(12);
+	doubled.printForward();
+	doubled += doubled;
+	doubled.deleteAllVal(12);
+	doubled.printForward();
+
+	system ("pause");
+	return 0;
+}
