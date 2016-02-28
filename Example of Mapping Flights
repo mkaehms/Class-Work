@@ -1,0 +1,442 @@
+//THIS WILL READ FILE INTO 2D ARRAY
+#include<iostream>
+#include<fstream>
+//#include<vector>
+#include<string>
+
+using namespace std;
+
+
+int main()
+{
+	string flights[200][20];
+	int f = 0, t = 0;
+	ifstream myfile ("Flight List.txt");
+	if(myfile.is_open())
+	{
+		string temp;
+		getline(myfile, temp);
+		flights[f][t] = temp;
+		cout<<f<<"	"<<t<<endl<<temp<<endl;
+		while(!myfile.eof())
+		{
+			getline(myfile, temp);
+			string ctemp = temp.substr(0,5);
+			cout<<ctemp<<endl;
+			if(ctemp == "From:")
+			{
+				t = 0;
+				f++;
+				flights[f][t] = temp;
+				cout<<f<<"	"<<t<<endl<<flights[f][t]<<endl;
+			}
+			else
+			{
+				t++;
+				flights[f][t] = temp;
+				cout<<f<<"	"<<t<<"	"<<flights[f][t]<<endl;
+			}
+		}
+		myfile.close();
+	}
+	else
+	{
+		cout<<"Unable to open file"<<endl;
+	}
+
+	system("pause");
+	return 0;
+}
+//THIS WILL LIST FULL NAMES OF LOCATIONS ALONG WITH PART 1
+
+#include<iostream>
+#include<fstream>
+//#include<vector>
+#include<string>
+
+using namespace std;
+
+string getFullName(string in, string flights[200][20]);
+bool checkExists(string check, string a[200], int l);
+
+int main()
+{
+	string flights[200][20];
+	int f = 0, t = 0;
+	//STEP 0: Read in File
+	ifstream myfile ("Flight List.txt");
+	if(myfile.is_open())
+	{
+		string temp;
+		getline(myfile, temp);
+		int l = temp.length();
+				temp = temp.substr(7, l);
+		flights[f][t] = temp;
+		cout<<f<<"	"<<t<<endl<<temp<<endl;
+		while(!myfile.eof())
+		{
+			getline(myfile, temp);
+			string ctemp = temp.substr(0,5);
+			//cout<<ctemp<<endl;
+			if(ctemp == "From:")
+			{
+				int l = temp.length();
+				temp = temp.substr(7, l);
+				t = 0;
+				f++;
+				flights[f][t] = temp;
+				cout<<f<<"	"<<t<<endl<<flights[f][t]<<endl;
+			}
+			else
+			{
+				int l = temp.length();
+				temp = temp.substr(7, l);
+				t++;
+				flights[f][t] = temp;
+				cout<<f<<"	"<<t<<endl<<flights[f][t]<<endl;
+			}
+		}
+		myfile.close();
+	}
+	else
+	{
+		cout<<"Unable to open file"<<endl;
+	}
+	
+	
+	//STEP 1: Get users input for from and to
+	string from, to, start, end;
+	cout<<"Where would you like your flight to start?"<<endl;
+	cin>>start;
+	if(start.length() < 3)
+	{
+		cout<<"error: too many choices please enter a more precise name"<<endl;
+	}
+	else
+	{
+	from = getFullName(start, flights);
+	}
+	cout<<"Where will you disembark?"<<endl;
+	cin>>end;
+	if(end.length() < 3)
+	{
+		cout<<"error: too many choices please enter a more precise name"<<endl;
+	}
+	else
+	{
+	to = getFullName(end, flights);
+	}
+
+	
+	system("pause");
+	return 0;
+}
+
+string getFullName(string in, string flights[200][20])
+{
+	string temp[200], ctemp;
+	//bool found;
+	int l = 0, c;
+	for(int i = 0; i < 124; i++)
+	{
+		for(int j = 0; j < 20; j++)
+		{
+			//cout<<flights[i][j]<<endl;
+			if(flights[i][j].find(in) != string::npos)
+			{
+				if(l > 0)
+				{
+				ctemp = flights[i][j];
+				if(!(checkExists(ctemp, temp, l)))
+				{
+				temp[l] = ctemp;
+				l++;
+				}
+				}
+				else
+				{
+					temp[l] = ctemp;
+					l++;
+				}
+				
+			}
+		}
+	}
+	for(int n = 1; n < l; n++)
+	{
+		cout<<n<<"	"<<temp[n]<<endl;
+	}
+	cout<<"Enter in the number of the location you wanted"<<endl;
+	cin>>c;
+
+	return temp[c];
+}
+
+bool checkExists(string check, string a[200], int l)
+{
+	bool exists = false;
+	for(int i = 0; i< l; i++)
+	{
+		if(check == a[i])
+		{
+			return true;
+		}
+	}
+	return false;
+}
+//FINAL
+
+#include<iostream>
+#include<fstream>
+#include<queue>
+#include<list>
+#include<string>
+
+using namespace std;
+
+string getFullName(string in, string flights[200][20]);
+bool checkExists(string check, string a[200], int l);
+void printPath(int parents[], int size, int startv, int endv, string flights[200][20]);
+void bfs (vector<int> alists[], int size, int start, int target, string flights[200][20]);
+
+int main()
+{
+	string flights[200][20];
+	int f = 0, t = 0;
+	vector<int> alist[200];
+	//STEP 0: Read in File
+	ifstream myfile ("Flight List.txt");
+	if(myfile.is_open())
+	{
+		string temp;
+		getline(myfile, temp);
+		int l = temp.length();
+				temp = temp.substr(7, l);
+		flights[f][t] = temp;
+		cout<<f<<"	"<<t<<endl<<temp<<endl;
+		while(!myfile.eof())
+		{
+			getline(myfile, temp);
+			string ctemp = temp.substr(0,5);
+			//cout<<ctemp<<endl;
+			if(ctemp == "From:")
+			{
+				int l = temp.length();
+				temp = temp.substr(7, l);
+				t = 0;
+				f++;
+				
+				flights[f][t] = temp;
+				cout<<f<<"	"<<t<<endl<<flights[f][t]<<endl;
+			}
+			else
+			{
+				int l = temp.length();
+				temp = temp.substr(7, l);
+				t++;
+			
+				flights[f][t] = temp;
+				cout<<f<<"	"<<t<<endl<<flights[f][t]<<endl;
+			}
+		}
+		myfile.close();
+	}
+	else
+	{
+		cout<<"Unable to open file"<<endl;
+	}
+	
+	for(int i = 0; i < 124; i++)
+	{
+		for(int j = 1; j < 20; j++)
+		{
+			for(int z = 0; z < 124; z++)
+			{
+			if(flights[z][0] == flights[i][j])
+			{
+				alist[i].push_back(z);
+			}
+			}
+		}
+	}
+	
+	int k = 0;
+	while(k != 1){
+	//STEP 1: Get users input for from and to
+	string from, to, start, end;
+	int F, T; //T[124];
+	/*for(int i = 0; i<124; i++)
+	{
+		T[i] = -1;
+	}*/
+	cout<<"Where would you like your flight to start?"<<endl;
+	cin>>start;
+	if(start.length() < 3)
+	{
+		cout<<"error: too many choices please enter a more precise name"<<endl;
+	}
+	else
+	{
+	from = getFullName(start, flights);
+	bool founds = false;
+	for(int i = 0; i < 124; i++)
+	{
+		if(flights[i][0] == from)
+		{
+			F = i;
+			founds = true;
+		}
+	}
+	if(!founds)
+	{
+		cout<<"That location does not have any flights leaving"<<endl;
+		continue;
+	}
+	}
+	cout<<"Where will you disembark?"<<endl;
+	cin>>end;
+	if(end.length() < 3)
+	{
+		cout<<"error: too many choices please enter a more precise name"<<endl;
+	}
+	else
+	{
+	to = getFullName(end, flights);
+	for(int i = 0; i < 124; i++)
+	{
+			if(flights[i][0] == to)
+			{
+				T = i;
+			}
+			else
+			{
+				for(int j = 0; j < 20; j++)
+				{
+					if(flights[i][j] == to)
+					{
+						T = i;
+					}
+				}
+			}
+	}
+	}
+	cout<<"Flight path from "<<from<<" to "<<to<<endl<<endl;
+	bfs(alist, 124, F, T, flights);
+	if(flights[T][0] != to)
+	{
+		for(int i = 0; i < 20; i++)
+		{
+			if(flights[T][i] == to)
+			{
+				cout<<flights[T][i]<<endl;
+			}
+		}
+	}
+	cout<<"If you are done enter in 1, else enter in a number 2-9"<<endl;
+	cin>>k;
+	
+	} 
+
+	system("pause");
+	return 0;
+}
+
+string getFullName(string in, string flights[200][20])
+{
+	string temp[200], ctemp;
+	//bool found;
+	int l = 0, c;
+	for(int i = 0; i < 124; i++)
+	{
+		for(int j = 0; j < 20; j++)
+		{
+			//cout<<flights[i][j]<<endl;
+			if(flights[i][j].find(in) != string::npos)
+			{
+				if(l > 0)
+				{
+				ctemp = flights[i][j];
+				if(!(checkExists(ctemp, temp, l)))
+				{
+				temp[l] = ctemp;
+				l++;
+				}
+				}
+				else
+				{
+					temp[l] = ctemp;
+					l++;
+				}
+				
+			}
+		}
+	}
+	if(l == 0)
+	{
+		cout<<"There are no Flights that contain "<<in<<endl;
+	}
+	else
+	{
+	for(int n = 1; n < l; n++)
+	{
+		cout<<n<<"	"<<temp[n]<<endl;
+	}
+	cout<<"Enter in the number of the location you wanted"<<endl;
+	cin>>c;
+	}
+
+	return temp[c];
+}
+
+bool checkExists(string check, string a[200], int l)
+{
+	bool exists = false;
+	for(int i = 0; i< l; i++)
+	{
+		if(check == a[i])
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+// traces parent pointers back from endv to startv
+void printPath(int parents[], int size, int startv, int endv, string flights[200][20]) {
+	if (endv != startv) {
+		printPath(parents, size, startv, parents[endv], flights);
+
+	}
+	cout << flights[endv][0] << endl;
+}
+	
+	
+void bfs (vector<int> alists[], int size, int start, int target, string flights[200][20]) {
+	int * parents = new int[size];
+	for (int i = 0; i< size; i++) parents[i] = -1;
+	parents[start] = start;
+	queue<int> q;
+	q.push(start);
+	bool found = false;
+	while (!q.empty() && !found) {
+		int v = q.front();
+		q.pop();
+		if (v == target) 
+			found = true;
+			
+		else for (int i = 0; i < alists[v].size(); i++) {
+			int w = alists[v][i];
+			if (parents[w] == -1) {
+				parents[w] = v;
+				q.push(w);
+			}
+		}
+	}
+	if (found) 			
+		printPath(parents,10,start,target, flights);  
+	else 
+		cout << "Not found";
+	cout << endl;
+	delete [] parents;
+}
